@@ -1,84 +1,53 @@
-﻿using BCrypt.Net;
-using JwInventory.Application.DTOs.Auth;
-using JwInventory.Application.Interfaces.Services;
+﻿using JwInventory.Application.DTOs.Auth;
 using JwInventory.Domain.Entities;
 using JwInventory.Domain.Enums;
 using JwInventory.Domain.Interfaces.Services;
+using JwInventory.Infrastructure.Repositories.Interfaces;
 using JwInventory.Infrastructure.Security;
-
 
 namespace JwInventory.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly JwtTokenGenerator _jwtTokenGenerator;
+        private readonly IUserRepository _userRepository;
+        private readonly JwtTokenGenerator _tokenGenerator;
 
-        public AuthService(JwtTokenGenerator jwtTokenGenerator)
+        public AuthService(IUserRepository userRepository, JwtTokenGenerator tokenGenerator)
         {
-            _jwtTokenGenerator = jwtTokenGenerator;
+            _userRepository = userRepository;
+            _tokenGenerator = tokenGenerator;
         }
 
-        public async Task<AuthResponseDto> RegisterAsync(RegisterUserDto dto)
+        public async Task<string> RegisterAsync(RegisterUserDto dto)
         {
-            // Valida role
-            if (!Enum.TryParse<UserRole>(dto.Role, true, out var role))
-                throw new ArgumentException("Role inválida");
+            var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
+            if (existingUser != null)
+                throw new Exception("Usuário já existe com este email.");
 
-            // Hash da senha
-            var passwordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password);
-
-            // Cria usuário apropriado (Admin, Colaborador etc)
-            User user = role switch
+            var user = new User
             {
-                UserRole.Admin => new AdminUser(dto.Name, dto.Email, passwordHash),
-                UserRole.Gerente => new ManagerUser(dto.Name, dto.Email, passwordHash),
-                _ => new EmployeeUser(dto.Name, dto.Email, passwordHash)
+                Id = Guid.NewGuid(),
+                Name = dto.Name,
+                Email = dto.Email,
+                PasswordHash = HashHelper.HashPassword(dto.Password),
+                Role = dto.Role
             };
 
-            // Aqui será salvo no banco futuramente...
+            await _userRepository.AddAsync(user);
 
-            var (token, expires) = _jwtTokenGenerator.GenerateToken(user.Id.ToString(), user.Email, user.Role);
-
-            return new AuthResponseDto
-            {
-                AccessToken = token,
-                RefreshToken = Guid.NewGuid().ToString(), // Em breve será persistido
-                ExpiresAt = expires,
-                Role = user.Role.ToString()
-            };
+            // Corrigido: passando os parâmetros corretos e pegando apenas o token
+            var (token, _) = _tokenGenerator.GenerateToken(user.Id.ToString(), user.Email, Enum.Parse<UserRole>(user.Role));
+            return token;
         }
 
-        public async Task<AuthResponseDto> LoginAsync(LoginUserDto dto)
+        public async Task<string> LoginAsync(LoginUserDto dto)
         {
-            // Buscar usuário do banco (em breve)
-            var user = GetFakeUser(dto.Email); // temporário
+            var user = await _userRepository.GetByEmailAsync(dto.Email);
+            if (user == null || !HashHelper.VerifyPassword(dto.Password, user.PasswordHash))
+                throw new Exception("Credenciais inválidas.");
 
-            if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
-                throw new UnauthorizedAccessException("Senha inválida");
-
-            var (token, expires) = _jwtTokenGenerator.GenerateToken(user.Id.ToString(), user.Email, user.Role);
-
-            return new AuthResponseDto
-            {
-                AccessToken = token,
-                RefreshToken = Guid.NewGuid().ToString(),
-                ExpiresAt = expires,
-                Role = user.Role.ToString()
-            };
-        }
-
-        // TEMPORÁRIO - simula usuário do banco
-        private User GetFakeUser(string email)
-        {
-            var hash = BCrypt.Net.BCrypt.HashPassword("123456");
-            return new AdminUser("Guilherme", email, hash);
-        }
-
-        public async Task<AuthResponseDto> RefreshTokenAsync(string refreshToken)
-        {
-            // Em breve: validar refresh token salvo no banco
-
-            throw new NotImplementedException();
+            var (token, _) = _tokenGenerator.GenerateToken(user.Id.ToString(), user.Email, Enum.Parse<UserRole>(user.Role));
+            return token;
         }
     }
 }

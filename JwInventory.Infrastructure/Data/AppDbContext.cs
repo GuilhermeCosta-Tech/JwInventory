@@ -5,7 +5,7 @@ namespace JwInventory.Infrastructure.Data
 {
     public class AppDbContext : DbContext
     {
-        public DbSet<User> Users => Set<User>(); // TPH (herança)
+        public DbSet<User> Users { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
             : base(options)
@@ -14,7 +14,7 @@ namespace JwInventory.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
+            modelBuilder.Entity<BaseUser>()
                 .HasDiscriminator<string>("UserType")
                 .HasValue<AdminUser>("Admin")
                 .HasValue<ManagerUser>("Gerente")

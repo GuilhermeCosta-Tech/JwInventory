@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JwInventory.Domain.Entities
 {
-    public class EmployeeUser : User
+    public class EmployeeUser : BaseUser
     {
         public EmployeeUser(string name, string email, string passwordHash)
     : base(name, email, passwordHash, Enums.UserRole.Colaborador)
