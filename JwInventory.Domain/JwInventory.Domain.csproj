@@ -6,8 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\JwInventory.Application\JwInventory.Application.csproj" />
-  </ItemGroup>
-
 </Project>
