@@ -87,7 +87,7 @@ https://localhost:7110/swagger
 
 ## 🔐 Testando a Autenticação
 
-1. Acesse `POST /api/Auth/register` e registre um usuário.
+1. Acesse `POST /api/Auth/register` e registre um usuário com a Role "Admin".
 2. Acesse `POST /api/Auth/login` com o mesmo usuário.
 3. Copie o token JWT retornado e clique em **Authorize (🔒)** no Swagger.
 4. Insira:
