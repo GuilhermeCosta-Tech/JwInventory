@@ -104,7 +104,7 @@ Agora você poderá acessar endpoints protegidos!
 
 *  Implementar roles e policies de acesso (`[Authorize(Roles = "Admin")]`)
 * CRUD completo para produtos e inventário
-* Interface Blazor ou frontend React/Vue
+* Interface Blazor
 * Deploy com Docker + Cloud Run (GCP)
 
 ---
