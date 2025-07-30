@@ -7,20 +7,16 @@ using System.Threading.Tasks;
 
 namespace JwInventory.Domain.Entities
 {
-    public abstract class BaseUser
+    public abstract class BaseUser(string name,
+        string email,
+        string passwordHash,
+        UserRole colaborador)
     {
-        protected BaseUser(string name, string email, string passwordHash, UserRole gerente)
-        {
-            Name = name;
-            Email = email;
-            PasswordHash = passwordHash;
-        }
-
-            public Guid Id { get; set; }
-            public string Name { get; set; } = "";
-            public string Email { get; set; } = "";
-            public string PasswordHash { get; set; } = "";
-            public string Role { get; set; } = "User"; // Default role
+        public Guid Id { get; set; }
+        public string Name { get; set; } = name;
+        public string Email { get; set; } = email;
+        public string PasswordHash { get; set; } = passwordHash;
+        public string Role { get; set; } = "User"; // Default role
 
     }
 }

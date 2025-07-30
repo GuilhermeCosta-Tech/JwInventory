@@ -1,6 +1,4 @@
-using JwInventory.Infrastructure.Data;
 using JwInventory.Infrastructure.Repositories;
-using JwInventory.Infrastructure.Repositories.Interfaces;
 using JwInventory.Infrastructure.Services;
 using JwInventory.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -9,7 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using JwInventory.Domain.Interfaces.Services;
 using System.Reflection;
-using Microsoft.OpenApi.Models;
+using JwInventory.Infrastructure.Data;
+using JwInventory.Application.Interfaces.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,11 +21,11 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "JW Inventory API",
         Version = "v1",
-        Description = "API para gerenciamento de inventário, autenticação e usuários.",
+        Description = "API para gerenciamento de produtos no inventário e autenticação de usuários.",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
             Name = "Seu Nome",
-            Email = "seu@email.com",
+            Email = "SeuEmail@email.com",
             Url = new Uri("https://github.com/seuusuario/jwinventory")
         },
         License = new Microsoft.OpenApi.Models.OpenApiLicense
@@ -71,7 +70,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // DB Context
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<JwInventoryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // JWT Authentication

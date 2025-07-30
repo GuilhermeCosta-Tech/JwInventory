@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace JwInventory.Domain.Entities
 {
-    public class EmployeeUser : BaseUser
+    public class EmployeeUser(string name,
+        string email,
+        string passwordHash) : BaseUser(name, 
+            email, 
+            passwordHash, 
+            Enums.UserRole.Colaborador)
     {
-        public EmployeeUser(string name, string email, string passwordHash)
-    : base(name, email, passwordHash, Enums.UserRole.Colaborador)
-        {
-        }
-
         public bool CanEditOwnProfile() => true;
     }
 }
