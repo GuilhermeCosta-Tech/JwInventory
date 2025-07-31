@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JwInventory.Domain.Validations.Alert
+namespace JwInventory.Domain.Validations.Explain
 {
     public class Report
     {

@@ -1,54 +1,56 @@
-﻿//using JwInventory.Application.DTOs.Auth;
-//using JwInventory.Application.Interfaces.Repositories;
-//using JwInventory.Domain.Entities;
-//using JwInventory.Domain.Enums;
-//using JwInventory.Domain.Interfaces.Services;
-//using JwInventory.Infrastructure.Repositories.Interfaces;
-//using JwInventory.Infrastructure.Security;
+﻿using JwInventory.Application.DTOs.Auth;
+using JwInventory.Application.DTOs.User;
+using JwInventory.Application.Interfaces.Repositories;
+using JwInventory.Application.Interfaces.Services;
+using JwInventory.Domain.Entities;
+using JwInventory.Domain.Enums;
+using JwInventory.Domain.Interfaces.Services;
+using JwInventory.Infrastructure.Security;
 
-//namespace JwInventory.Infrastructure.Services
-//{
-//    public class AuthService : IAuthService
-//    {
-//        private readonly IUserRepository _userRepository;
-//        private readonly JwtTokenGenerator _tokenGenerator;
+namespace JwInventory.Infrastructure.Services
+{
+    public class AuthService : IAuthService
+    {
+        private readonly IUserRepository _userRepository;
+        private readonly JwtTokenGenerator _tokenGenerator;
 
-//        public AuthService(IUserRepository userRepository, JwtTokenGenerator tokenGenerator)
-//        {
-//            _userRepository = userRepository;
-//            _tokenGenerator = tokenGenerator;
-//        }
+        public AuthService(IUserRepository userRepository, JwtTokenGenerator tokenGenerator)
+        {
+            _userRepository = userRepository;
+            _tokenGenerator = tokenGenerator;
+        }
 
-//        public async Task<string> RegisterAsync(RegisterUserDto dto)
-//        {
-//            var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
-//            if (existingUser != null)
-//                throw new Exception("Usuário já existe com este email.");
+        public async Task<UserResponse> RegisterAsync(RegisterUserDto dto)
+        {
+            var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
+            if (existingUser != null)
+                throw new Exception("Usuário já existe com este email.");
 
-//            var user = new User
-//            {
-//                Id = Guid.NewGuid(),
-//                Name = dto.Name,
-//                Email = dto.Email,
-//                PasswordHash = HashHelper.HashPassword(dto.Password),
-//                Role = dto.Role
-//            };
+            var createUserDto = new CreateUserDto
+            {
+                Name = dto.Name,
+                Email = dto.Email,
+                PasswordHash = HashHelper.HashPassword(dto.Password),
+                Role = "User"
+            };
 
-//            await _userRepository.AddAsync(user);
+            var createdUser = await _userRepository.CreateAsync(createUserDto);
 
-//            // Corrigido: passando os parâmetros corretos e pegando apenas o token
-//            var (token, _) = _tokenGenerator.GenerateToken(user.Id.ToString(), user.Email, Enum.Parse<UserRole>(user.Role));
-//            return token;
-//        }
+            var (token, _) = _tokenGenerator.GenerateToken(createdUser.Id.ToString(), 
+                createdUser.Email,
+                Enum.Parse<UserRole>(createdUser.Role));
+            return token;
+        }
 
-//        public async Task<string> LoginAsync(LoginUserDto dto)
-//        {
-//            var user = await _userRepository.GetByEmailAsync(dto.Email);
-//            if (user == null || !HashHelper.VerifyPassword(dto.Password, user.PasswordHash))
-//                throw new Exception("Credenciais inválidas.");
+        public async Task<UserResponse> LoginAsync(LoginUserDto dto)
+        {
+            var user = await _userRepository.GetByEmailAsync(dto.Email);
+            if (user == null || !HashHelper.VerifyPassword(dto.Password, user.PasswordHash))
+                throw new Exception("Credenciais inválidas.");
 
-//            var (token, _) = _tokenGenerator.GenerateToken(user.Id.ToString(), user.Email, Enum.Parse<UserRole>(user.Role));
-//            return token;
-//        }
-//    }
-//}
+            var (token, _) = _tokenGenerator.GenerateToken(user.Id.ToString(), user.Email, Enum.Parse<UserRole>(user.Role));
+            return token;
+        }
+    }
+}
+

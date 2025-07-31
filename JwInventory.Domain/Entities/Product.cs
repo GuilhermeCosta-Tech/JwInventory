@@ -8,21 +8,14 @@ namespace JwInventory.Domain.Entities
 {
     public class Product
     {
-        public Product()
-        {
-
-        }
-
-        public Product(string nome, int id)
+        public Product(string nome, Guid id)
         {
             Nome = nome;
             Id = id;
         }
 
+        public Guid Id { get; set; } = Guid.NewGuid();
         public string Nome { get; set; }
-        public int Id { get; set; }
-        public int? UserId { get; set; }
-        public virtual User? User { get; set; }
         public virtual ICollection<Product> Products { get; set; }
         public string Description { get; set; }
         public decimal Preco { get; set; }

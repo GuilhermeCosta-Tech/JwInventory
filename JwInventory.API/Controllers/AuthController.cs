@@ -1,5 +1,5 @@
 ﻿using JwInventory.Application.DTOs.Auth;
-using JwInventory.Domain.Interfaces.Services;
+using JwInventory.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 

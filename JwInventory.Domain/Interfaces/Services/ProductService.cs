@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using JwInventory.Application.Interfaces.Repositories;
-using JwInventory.Application.Interfaces.Services;
 using JwInventory.Domain.Entities;
 using JwInventory.Domain.Interfaces.Repositories;
 using JwInventory.Domain.Validations;
@@ -12,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using IProductRepository = JwInventory.Domain.Interfaces.Repositories.IProductRepository;
 
-namespace JwInventory.Application.Service
+namespace JwInventory.Domain.Interfaces.Services
 {
     public class ProductService : IProductService
     {

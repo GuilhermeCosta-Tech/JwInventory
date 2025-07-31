@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JwInventory.Application\JwInventory.Application.csproj" />
     <ProjectReference Include="..\JwInventory.Domain\JwInventory.Domain.csproj" />
   </ItemGroup>
 

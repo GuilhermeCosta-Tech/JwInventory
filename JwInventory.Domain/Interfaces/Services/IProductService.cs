@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JwInventory.Application.Interfaces.Services
+namespace JwInventory.Domain.Interfaces.Services
 {
     public interface IProductService
     {

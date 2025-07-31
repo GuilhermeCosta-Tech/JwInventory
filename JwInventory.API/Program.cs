@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using JwInventory.Domain.Interfaces.Services;
 using System.Reflection;
 using JwInventory.Infrastructure.Data;
 using JwInventory.Application.Interfaces.Repositories;
+using JwInventory.Application.Interfaces.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

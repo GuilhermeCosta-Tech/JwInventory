@@ -3,7 +3,7 @@
 /// <summary>
 /// Interface para os serviços de autenticação de usuários.
 /// </summary>
-namespace JwInventory.Domain.Interfaces.Services
+namespace JwInventory.Application.Interfaces.Services
 {
     public interface IAuthService
     {
