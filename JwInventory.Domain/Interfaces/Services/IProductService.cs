@@ -1,5 +1,4 @@
-﻿using JwInventory.Application.DTOs.Product;
-using JwInventory.Domain.Entities;
+﻿using JwInventory.Domain.Entities;
 using JwInventory.Domain.Validations.Explain;
 using System;
 using System.Collections.Generic;

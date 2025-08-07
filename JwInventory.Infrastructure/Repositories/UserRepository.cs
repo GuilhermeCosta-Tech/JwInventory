@@ -33,7 +33,7 @@ public class UserRepository : IUserRepository
         });
     }
 
-    public async Task<UserDto> CreateAsync(CreateUserDto dto)
+    public async Task<UserDto> CreateUserAsync(CreateUserDto dto)
     {
         var user = new User
         {
@@ -98,5 +98,15 @@ public class UserRepository : IUserRepository
         _context.Users.Remove(user);
         await _context.SaveChangesAsync();
         return true;
+    }
+
+    public Task AddAsync(CreateUserDto createUserDto)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void UpdateAsync(Task<UserDto?> existingUser)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -10,6 +10,7 @@ using JwInventory.Infrastructure.Data;
 using JwInventory.Application.Interfaces.Repositories;
 using JwInventory.Application.Interfaces.Services;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services
@@ -24,9 +25,9 @@ builder.Services.AddSwaggerGen(c =>
         Description = "API para gerenciamento de produtos no inventário e autenticação de usuários.",
         Contact = new Microsoft.OpenApi.Models.OpenApiContact
         {
-            Name = "Seu Nome",
-            Email = "SeuEmail@email.com",
-            Url = new Uri("https://github.com/seuusuario/jwinventory")
+            Name = "Guilherme Costa",
+            Email = "guilhermecosta.tech@gmail.com",
+            Url = new Uri("https://github.com/GuilhermeCosta-Tech/JwInventory")
         },
         License = new Microsoft.OpenApi.Models.OpenApiLicense
         {
@@ -64,9 +65,9 @@ builder.Services.AddSwaggerGen(c =>
 
     c.EnableAnnotations();
 
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath);
+    //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    //c.IncludeXmlComments(xmlPath);
 });
 
 // DB Context
@@ -102,6 +103,10 @@ builder.Services.AddAuthentication(options =>
 // Injeção de dependência
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
 
 builder.Services.AddScoped<JwtTokenGenerator>();
 

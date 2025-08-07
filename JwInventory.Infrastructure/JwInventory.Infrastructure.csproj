@@ -21,8 +21,8 @@
 	  <PackageReference Include="Microsoft.AspnetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="8.0.0" />   
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.6" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.35.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>

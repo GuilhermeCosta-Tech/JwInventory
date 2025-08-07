@@ -12,7 +12,7 @@ namespace JwInventory.Application.DTOs.User
         public Guid Id { get; set; }
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
-        public string Email { get; set; } = default!;
+        public string Email { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? PasswordHash { get; set; }
         public string Role { get; set; } = "User"; 

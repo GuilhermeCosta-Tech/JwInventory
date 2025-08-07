@@ -4,11 +4,12 @@ namespace JwInventory.Application.Interfaces.Services
 {
     public interface IUserService
     {
+        Task<UserDto> CreateUserAsync(CreateUserDto createUserDto);
         Task<UserDto> GetByIdAsync(Guid id);
         Task<IEnumerable<UserDto>> GetAllAsync();
-        Task<UserDto> CreateAsync(CreateUserDto dto);
+        Task<UserDto> UpdateAsync(Guid id, UserDto userDto);
         Task<bool> DeleteAsync(Guid id);
-        Task GetByEmailAsync(string email);
+        Task<UserDto> GetByEmailAsync(string email);
 
     }
 }

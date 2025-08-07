@@ -34,12 +34,17 @@ namespace JwInventory.Infrastructure.Services
                 Role = "User"
             };
 
-            var createdUser = await _userRepository.CreateAsync(createUserDto);
+            var createdUser = await _userRepository.CreateUserAsync(createUserDto);
 
-            var (token, _) = _tokenGenerator.GenerateToken(createdUser.Id.ToString(), 
+            var (token, expiration) = _tokenGenerator.GenerateToken(createdUser.Id.ToString(),
                 createdUser.Email,
                 Enum.Parse<UserRole>(createdUser.Role));
-            return token;
+
+            return new UserResponse
+            {
+                Token = token,
+                Expiration = expiration
+            };
         }
 
         public async Task<UserResponse> LoginAsync(LoginUserDto dto)
@@ -48,8 +53,13 @@ namespace JwInventory.Infrastructure.Services
             if (user == null || !HashHelper.VerifyPassword(dto.Password, user.PasswordHash))
                 throw new Exception("Credenciais inválidas.");
 
-            var (token, _) = _tokenGenerator.GenerateToken(user.Id.ToString(), user.Email, Enum.Parse<UserRole>(user.Role));
-            return token;
+            var (token, expiration) = _tokenGenerator.GenerateToken(user.Id.ToString(), user.Email, Enum.Parse<UserRole>(user.Role));
+
+            return new UserResponse
+            {
+                Token = token,
+                Expiration = expiration
+            };
         }
     }
 }

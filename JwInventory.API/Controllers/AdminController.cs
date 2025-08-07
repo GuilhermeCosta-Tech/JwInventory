@@ -26,7 +26,7 @@ namespace JwInventory.API.Controllers
         [SwaggerResponse(403, "Acesso negado.")]
         public IActionResult GetAdminSecret()
         {
-            return Ok(new { Message = "Welcome to the Admin acess!" });
+            return Ok(new { Message = "Você está logado como Administrador!" });
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace JwInventory.API.Controllers
         [SwaggerResponse(403, "Acesso negado.")]
         public IActionResult GetAdminDashboard()
         {
-            return Ok(new { Message = "This is the Admin Dashboard!" });
+            return Ok(new { Message = "Este é o painel do Adm!" });
         }
     }
 }

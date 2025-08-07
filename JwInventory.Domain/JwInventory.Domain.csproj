@@ -11,8 +11,8 @@
 	  <PackageReference Include="Microsoft.AspnetCore.Identity.EntityFrameworkCore" Version="7.0.13" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <ProjectReference Include="..\JwInventory.Application\JwInventory.Application.csproj" />
-  </ItemGroup>
+  </ItemGroup>-->
 
 </Project>
