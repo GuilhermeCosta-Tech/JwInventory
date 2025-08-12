@@ -1,47 +1,78 @@
 ﻿using JwInventory.Application.DTOs.Auth;
-using JwInventory.Application.DTOs.User;
-using JwInventory.Application.Interfaces.Repositories;
 using JwInventory.Application.Interfaces.Services;
 using JwInventory.Domain.Entities;
-using JwInventory.Domain.Enums;
-using JwInventory.Domain.Interfaces.Services;
 using JwInventory.Infrastructure.Security;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace JwInventory.Infrastructure.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly UserManager<PessoaComAcesso> _userManager;
+        private readonly SignInManager<PessoaComAcesso> _signInManager;
         private readonly JwtTokenGenerator _tokenGenerator;
+        private readonly RoleManager<PerfilDeAcesso> _roleManager;
 
-        public AuthService(IUserRepository userRepository, JwtTokenGenerator tokenGenerator)
+        public AuthService(
+            UserManager<PessoaComAcesso> userManager,
+            SignInManager<PessoaComAcesso> signInManager,
+            JwtTokenGenerator tokenGenerator,
+            RoleManager<PerfilDeAcesso> roleManager)
         {
-            _userRepository = userRepository;
+            _userManager = userManager;
+            _signInManager = signInManager;
             _tokenGenerator = tokenGenerator;
+            _roleManager = roleManager;
         }
 
         public async Task<UserResponse> RegisterAsync(RegisterUserDto dto)
         {
-            var existingUser = await _userRepository.GetByEmailAsync(dto.Email);
+            if (dto == null) throw new ArgumentNullException(nameof(dto));
+
+            var existingUser = await _userManager.FindByEmailAsync(dto.Email);
             if (existingUser != null)
                 throw new Exception("Usuário já existe com este email.");
 
-            var createUserDto = new CreateUserDto
+            PessoaComAcesso newUser;
+            var role = dto.Role ?? "Colaborador"; // Default role
+
+            switch (role.ToLower())
             {
-                Name = dto.Name,
-                Email = dto.Email,
-                PasswordHash = HashHelper.HashPassword(dto.Password),
-                Role = "User"
-            };
+                case "admin":
+                    newUser = new AdminUser { UserName = dto.Name, Email = dto.Email };
+                    break;
+                case "gerente":
+                    newUser = new ManagerUser { UserName = dto.Name, Email = dto.Email };
+                    break;
+                default:
+                    newUser = new EmployeeUser { UserName = dto.Name, Email = dto.Email };
+                    role = "Colaborador";
+                    break;
+            }
 
-            var createdUser = await _userRepository.CreateUserAsync(createUserDto);
+            var result = await _userManager.CreateAsync(newUser, dto.Password);
+            if (!result.Succeeded)
+            {
+                throw new Exception($"Erro ao criar usuário: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
 
-            var (token, expiration) = _tokenGenerator.GenerateToken(createdUser.Id.ToString(),
-                createdUser.Email,
-                Enum.Parse<UserRole>(createdUser.Role));
+            // Adiciona a Role ao usuário
+            if (!await _roleManager.RoleExistsAsync(role))
+            {
+                await _roleManager.CreateAsync(new PerfilDeAcesso(role));
+            }
+            await _userManager.AddToRoleAsync(newUser, role);
+
+
+            var roles = await _userManager.GetRolesAsync(newUser);
+            var (token, expiration) = _tokenGenerator.GenerateToken(newUser, roles);
 
             return new UserResponse
             {
+                Id = newUser.Id.ToString(),
+                Name = newUser.UserName,
+                Email = newUser.Email,
                 Token = token,
                 Expiration = expiration
             };
@@ -49,14 +80,22 @@ namespace JwInventory.Infrastructure.Services
 
         public async Task<UserResponse> LoginAsync(LoginUserDto dto)
         {
-            var user = await _userRepository.GetByEmailAsync(dto.Email);
-            if (user == null || !HashHelper.VerifyPassword(dto.Password, user.PasswordHash))
+            var user = await _userManager.FindByEmailAsync(dto.Email);
+            if (user == null)
                 throw new Exception("Credenciais inválidas.");
 
-            var (token, expiration) = _tokenGenerator.GenerateToken(user.Id.ToString(), user.Email, Enum.Parse<UserRole>(user.Role));
+            var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, lockoutOnFailure: false);
+            if (!result.Succeeded)
+                throw new Exception("Credenciais inválidas.");
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var (token, expiration) = _tokenGenerator.GenerateToken(user, roles);
 
             return new UserResponse
             {
+                Id = user.Id.ToString(),
+                Name = user.UserName,
+                Email = user.Email,
                 Token = token,
                 Expiration = expiration
             };

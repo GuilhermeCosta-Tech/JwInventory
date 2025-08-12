@@ -1,9 +1,11 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using JwInventory.Domain.Entities;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using JwInventory.Domain.Enums;
-using Microsoft.Extensions.Configuration;
 
 namespace JwInventory.Infrastructure.Security
 {
@@ -16,34 +18,33 @@ namespace JwInventory.Infrastructure.Security
             _configuration = configuration;
         }
 
-        public (string token, DateTime expiration) GenerateToken(string userId, string email, UserRole role)
+        public (string token, DateTime expiration) GenerateToken(PessoaComAcesso user, IList<string> roles)
         {
-            var jwtKey = _configuration["JwtConfig:Key"];
-            var issuer = _configuration["JwtConfig:Issuer"];
-            var audience = _configuration["JwtConfig:Audience"];
-            var expires = DateTime.UtcNow.AddMinutes(15);
-            var claims = new[]
-           {
-                new Claim(JwtRegisteredClaimNames.Sub, userId),
-                new Claim(JwtRegisteredClaimNames.Email, email),
-                new Claim(ClaimTypes.Role, role.ToString()),
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtConfig:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var expiration = DateTime.UtcNow.AddHours(2);
+
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var token = new JwtSecurityToken(
-                issuer,
-                audience,
-                claims,
-                expires: expires,
+                issuer: _configuration["JwtConfig:Issuer"],
+                audience: _configuration["JwtConfig:Audience"],
+                claims: claims,
+                expires: expiration,
                 signingCredentials: creds
             );
 
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return (jwt, expires);
+            return (new JwtSecurityTokenHandler().WriteToken(token), expiration);
         }
     }
 }

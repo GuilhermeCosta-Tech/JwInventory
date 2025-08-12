@@ -12,7 +12,6 @@
     },
     "https": {
       "commandName": "Project",
-      "workingDirectory": "C:\\Users\\55119\\source\\repos\\JwInventory\\JwInventory",
       "launchBrowser": true,
       "launchUrl": "swagger",
       "environmentVariables": {
@@ -39,4 +38,4 @@
       "sslPort": 44329
     }
   }
-}
+}}

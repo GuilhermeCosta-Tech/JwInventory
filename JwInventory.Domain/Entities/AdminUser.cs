@@ -6,11 +6,17 @@ using System.Threading.Tasks;
 
 namespace JwInventory.Domain.Entities
 {
-    public class AdminUser : BaseUser
+    public class AdminUser : PessoaComAcesso
     {
-        public AdminUser(string name, string email, string passwordHash)
-            : base(name, email, passwordHash, Enums.UserRole.Admin) 
+        public AdminUser()
         {
+            
+        }
+        public AdminUser(string name, string email, string passwordHash)
+        {
+            UserName = name;
+            Email = email;
+            PasswordHash = passwordHash;
         }
 
         public bool CanAccessAllProducts() => true;

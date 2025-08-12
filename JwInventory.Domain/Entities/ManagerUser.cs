@@ -6,13 +6,16 @@ using System.Threading.Tasks;
 
 namespace JwInventory.Domain.Entities
 {
-    public class ManagerUser : BaseUser
+    public class ManagerUser : PessoaComAcesso
     {
-        public ManagerUser(string name, string email, string passwordHash)
-            : base(name, email, passwordHash, Enums.UserRole.Gerente)
+        public ManagerUser() { }
+
+        public ManagerUser(string name, string email)
         {
+            UserName = name;
+            Email = email;
         }
 
-        public bool CanViewInventoryReports() => true;
+        public bool CanManageProducts() => true;
     }
 }

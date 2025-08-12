@@ -9,8 +9,8 @@ namespace JwInventory.Infrastructure.Data
         {
             var optionsBuilder = new DbContextOptionsBuilder<JwInventoryDbContext>();
 
-            // ⚠️ Connection string fixa só para o design-time  
-            var connectionString = "Server=localhost;Database=JwInventoryDb;Trusted_Connection=True;TrustServerCertificate=True;";
+            // Alinhando a connection string com a usada em appsettings.json
+            var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=JwInventoryDb;Trusted_Connection=True;";
             optionsBuilder.UseSqlServer(connectionString);
 
             return new JwInventoryDbContext(optionsBuilder.Options);

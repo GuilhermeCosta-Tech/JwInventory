@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using JwInventory.Domain.Entities;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace JwInventory.Infrastructure.Data
 {
@@ -38,11 +37,18 @@ namespace JwInventory.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Product>()
+
+            // Configura a hierarquia de usuários (TPH)
+            modelBuilder.Entity<PessoaComAcesso>()
                 .HasDiscriminator<string>("UserType")
                 .HasValue<AdminUser>("Admin")
                 .HasValue<ManagerUser>("Gerente")
                 .HasValue<EmployeeUser>("Colaborador");
+
+            // Configura a precisão da propriedade Preco para evitar warnings
+            modelBuilder.Entity<Product>()
+                .Property(p => p.Preco)
+                .HasColumnType("decimal(18, 2)");
         }
     }
 }

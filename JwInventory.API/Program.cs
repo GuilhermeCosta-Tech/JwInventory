@@ -9,6 +9,8 @@ using System.Reflection;
 using JwInventory.Infrastructure.Data;
 using JwInventory.Application.Interfaces.Repositories;
 using JwInventory.Application.Interfaces.Services;
+using JwInventory.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -74,10 +76,27 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<JwInventoryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// JWT Authentication
+// Configurar Identity
+builder.Services.AddIdentity<PessoaComAcesso, PerfilDeAcesso>(options =>
+{
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+})
+    .AddEntityFrameworkStores<JwInventoryDbContext>()
+    .AddDefaultTokenProviders();
+
+// Configurar Autenticação JWT
 var key = builder.Configuration["JwtConfig:Key"];
 var issuer = builder.Configuration["JwtConfig:Issuer"];
 var audience = builder.Configuration["JwtConfig:Audience"];
+
+if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience))
+{
+    throw new InvalidOperationException("As configurações de JWT (Key, Issuer, Audience) não foram encontradas ou estão vazias. Verifique o appsettings.json.");
+}
 
 builder.Services.AddAuthentication(options =>
 {
@@ -100,6 +119,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorization();
+
 // Injeção de dependência
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -107,12 +128,10 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-
 builder.Services.AddScoped<JwtTokenGenerator>();
 
 var app = builder.Build();
 
-// Middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");

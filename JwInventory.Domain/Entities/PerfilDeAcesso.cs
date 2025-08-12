@@ -9,5 +9,12 @@ namespace JwInventory.Domain.Entities
 {
     public class PerfilDeAcesso : IdentityRole<int>
     {
+        public PerfilDeAcesso() : base()
+        {
+        }
+
+        public PerfilDeAcesso(string roleName) : base(roleName)
+        {
+        }
     }
 }
