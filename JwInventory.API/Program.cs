@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -30,15 +29,9 @@ builder.Services.AddSwaggerGen(c =>
             Name = "Guilherme Costa",
             Email = "guilhermecosta.tech@gmail.com",
             Url = new Uri("https://github.com/GuilhermeCosta-Tech/JwInventory")
-        },
-        License = new Microsoft.OpenApi.Models.OpenApiLicense
-        {
-            Name = "MIT",
-            Url = new Uri("https://opensource.org/licenses/MIT")
         }
     });
 
-    // Configuração do esquema de segurança JWT no Swagger
     var jwtSecurityScheme = new Microsoft.OpenApi.Models.OpenApiSecurityScheme
     {
         Scheme = "bearer",
@@ -66,17 +59,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 
     c.EnableAnnotations();
-
-    //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    //c.IncludeXmlComments(xmlPath);
 });
 
-// DB Context
 builder.Services.AddDbContext<JwInventoryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Configurar Identity
 builder.Services.AddIdentity<PessoaComAcesso, PerfilDeAcesso>(options =>
 {
     options.Password.RequireLowercase = false;
@@ -88,7 +75,6 @@ builder.Services.AddIdentity<PessoaComAcesso, PerfilDeAcesso>(options =>
     .AddEntityFrameworkStores<JwInventoryDbContext>()
     .AddDefaultTokenProviders();
 
-// Configurar Autenticação JWT
 var key = builder.Configuration["JwtConfig:Key"];
 var issuer = builder.Configuration["JwtConfig:Issuer"];
 var audience = builder.Configuration["JwtConfig:Audience"];
@@ -119,9 +105,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminsOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("AdminsAndManagersOnly", policy => policy.RequireRole("Admin", "Gerente"));
+});
 
-// Injeção de dependência
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
@@ -150,7 +139,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Redirecionar / para /swagger
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/swagger");

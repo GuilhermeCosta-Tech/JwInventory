@@ -35,7 +35,7 @@ namespace JwInventory.Infrastructure.Services
                 throw new Exception("Usuário já existe com este email.");
 
             PessoaComAcesso newUser;
-            var role = dto.Role ?? "Colaborador"; // Default role
+            var role = dto.Role ?? "Colaborador"; 
 
             switch (role.ToLower())
             {

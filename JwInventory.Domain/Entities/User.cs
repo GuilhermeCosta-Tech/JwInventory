@@ -11,13 +11,12 @@ namespace JwInventory.Domain.Entities
         public virtual ICollection<Product> Products { get; set; } = new List<Product>();
         public User()
         {
-            // Foto de perfil padrão
         }
 
         public User(string name,
             string email, 
             string passwordHash, 
-            string role = "User")
+            string role = "Colaborador")
         {
             Name = name;
             Email = email;
@@ -30,6 +29,6 @@ namespace JwInventory.Domain.Entities
         public string Email { get; set; } = string.Empty; 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow; 
         public string PasswordHash { get; set; } = string.Empty; 
-        public string Role { get; set; } = "User"; // Default role
+        public string Role { get; set; } = "Colaborador"; 
     }
 }

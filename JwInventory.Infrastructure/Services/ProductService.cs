@@ -92,10 +92,9 @@ namespace JwInventory.Infrastructure.Services
             return Task.FromResult(_mapper.Map<List<ProductDto>>(products));
         }
 
-        Task IProductService.CreateProductAsync(ProductDto productDto)
+        public Task CreateProductAsync(CreateProductDto createProductDto)
         {
-
-            return CreateProductAsync(productDto);
+            throw new NotImplementedException();
         }
     }
 }

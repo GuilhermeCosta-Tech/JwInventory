@@ -78,7 +78,6 @@ namespace JwInventory.API.Controllers
             }
         }
 
-        
 
         /// <summary>
         /// Endpoint acessível por Gerentes e Admins.

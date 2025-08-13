@@ -11,7 +11,6 @@ namespace JwInventory.Domain.Entities
         public virtual ICollection<Product> Products { get; set; } = new List<Product>();
         public InternalTransfer()
         {
-            // Default constructor for EF Core
         }
         public InternalTransfer(string nome, string bio, int quantidade, Guid produtoId, Guid destinoId, Guid origemId)
         {

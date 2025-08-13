@@ -9,9 +9,12 @@ using System.Threading.Tasks;
 
 namespace JwInventory.API.Controllers
 {
+    /// <summary>
+    /// Gerencia as operações de CRUD para os produtos somente com autenticação do usuário.
+    /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
-    [Authorize]
+    [Route("api/product")]
+    [Authorize] // Solicita autenticação para todos os endpoints, exceto endpoints marcados com '[AllowAnonymous]'.
     public class ProductController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -21,21 +24,36 @@ namespace JwInventory.API.Controllers
             _productService = productService;
         }
 
+        /// <summary>
+        /// Retorna uma lista de todos os produtos cadastrados.
+        /// </summary>
+        /// <remarks>
+        /// Este endpoint é público e não requer autenticação!
+        /// </remarks>
+        /// <returns>Uma lista de produtos.</returns>
         [HttpGet]
         [AllowAnonymous]
-        [SwaggerOperation(Summary = "Obter todos os produtos", Description = "Retorna uma lista de todos os produtos cadastrados.")]
-        [SwaggerResponse(200, "Sucesso", typeof(IEnumerable<ProductDto>))]
+        [SwaggerOperation(Summary = "Obter todos os produtos")]
+        [SwaggerResponse(200, "A lista de produtos foi retornada com sucesso.", typeof(IEnumerable<ProductDto>))]
         public async Task<IActionResult> GetAll()
         {
             var products = await _productService.ListByFilterAsync();
             return Ok(products);
         }
 
+        /// <summary>
+        /// Busca um produto específico pelo seu ID.
+        /// </summary>
+        /// <param name="id">O ID do produto a ser buscado.</param>
+        /// <remarks>
+        /// Este endpoint é público e não requer autenticação.
+        /// </remarks>
+        /// <returns>O produto correspondente ao ID fornecido.</returns>
         [HttpGet("{id:guid}")]
         [AllowAnonymous]
-        [SwaggerOperation(Summary = "Obter produto por ID", Description = "Retorna um produto específico pelo seu ID.")]
-        [SwaggerResponse(200, "Sucesso", typeof(ProductDto))]
-        [SwaggerResponse(404, "Produto não encontrado")]
+        [SwaggerOperation(Summary = "Obter produto por ID")]
+        [SwaggerResponse(200, "O produto foi encontrado e retornado com sucesso.", typeof(ProductDto))]
+        [SwaggerResponse(404, "Nenhum produto com o ID especificado foi encontrado.")]
         public async Task<IActionResult> GetById(Guid id)
         {
             var product = await _productService.GetByIdAsync(id);
@@ -46,24 +64,45 @@ namespace JwInventory.API.Controllers
             return Ok(product);
         }
 
+        /// <summary>
+        /// Cria um novo produto no sistema.
+        /// </summary>
+        /// <param name="createProductDto">Os dados do produto a ser criado.</param>
+        /// <remarks>
+        /// Requer permissão de **Administrador** ou **Gerente**. O ID do produto é gerado automaticamente.
+        /// </remarks>
+        /// <returns>O produto recém-criado, incluindo seu novo ID.</returns>
         [HttpPost]
-        [Authorize(Roles = "Admin,Gerente")]
-        [SwaggerOperation(Summary = "Criar um novo produto", Description = "Cria um novo produto no sistema. Requer permissão de Administrador ou Gerente.")]
-        [SwaggerResponse(201, "Produto criado com sucesso", typeof(ProductDto))]
-        [SwaggerResponse(400, "Dados inválidos")]
-        public async Task<IActionResult> Create([FromBody] ProductDto createProductDto)
+        [Authorize(Policy = "AdminsAndManagersOnly")]
+        [SwaggerOperation(Summary = "Criar um novo produto")]
+        [SwaggerResponse(201, "Produto criado com sucesso.", typeof(ProductDto))]
+        [SwaggerResponse(400, "Os dados fornecidos para o produto são inválidos.")]
+        [SwaggerResponse(401, "Não autorizado (token inválido ou ausente).")]
+        [SwaggerResponse(403, "Acesso negado (usuário não tem a permissão necessária).")]
+        public async Task<IActionResult> Create([FromBody] CreateProductDto createProductDto)
         {
             await _productService.CreateProductAsync(createProductDto);
-            // Supondo que o ProductDto recebido já contém o Id do produto criado
-            return CreatedAtAction(nameof(GetById), new { id = createProductDto.Id }, createProductDto);
+            // Este método ainda retorna somente void, portanto não há retorno de dados do produto criado ainda!
+            // Retorna 201 Created sem corpo, pois não há retorno do produto.
+            return Created(string.Empty, null);
         }
             
+       /// Atualiza um produto existente.
+        /// </summary>
+        /// <param name="id">O ID do produto a ser atualizado.</param>
+        /// <param name="updateProductDto">Os novos dados para o produto.</param>
+        /// <remarks>
+        /// Requer permissão de **Administrador** ou **Gerente**.
+        /// </remarks>
+        /// <returns>O produto com os dados atualizados.</returns>
         [HttpPut("{id:guid}")]
-        [Authorize(Roles = "Admin,Gerente")]
-        [SwaggerOperation(Summary = "Atualizar um produto", Description = "Atualiza um produto existente. Requer permissão de Administrador ou Gerente.")]
-        [SwaggerResponse(200, "Produto atualizado com sucesso", typeof(ProductDto))]
-        [SwaggerResponse(400, "Dados inválidos")]
-        [SwaggerResponse(404, "Produto não encontrado")]
+        [Authorize(Policy = "AdminsAndManagersOnly")]
+        [SwaggerOperation(Summary = "Atualizar um produto")]
+        [SwaggerResponse(200, "Produto atualizado com sucesso.", typeof(ProductDto))]
+        [SwaggerResponse(400, "Os dados fornecidos são inválidos.")]
+        [SwaggerResponse(404, "Nenhum produto com o ID especificado foi encontrado.")]
+        [SwaggerResponse(401, "Não autorizado.")]
+        [SwaggerResponse(403, "Acesso negado.")]
         public async Task<IActionResult> Update(Guid id, [FromBody] ProductDto updateProductDto)
         {
             var product = await _productService.UpdateAsync(id, updateProductDto);
@@ -74,11 +113,21 @@ namespace JwInventory.API.Controllers
             return Ok(product);
         }
 
+        /// <summary>
+        /// Exclui um produto do sistema.
+        /// </summary>
+        /// <param name="id">O ID do produto a ser excluído.</param>
+        /// <remarks>
+        /// Requer permissão de **Administrador**. Esta é uma operação destrutiva.
+        /// </remarks>
+        /// <returns>Nenhum conteúdo se a exclusão for bem-sucedida.</returns>
         [HttpDelete("{id:guid}")]
-        [Authorize(Roles = "Admin")]
-        [SwaggerOperation(Summary = "Deletar um produto", Description = "Deleta um produto pelo seu ID. Requer permissão de Administrador.")]
-        [SwaggerResponse(204, "Produto deletado com sucesso")]
-        [SwaggerResponse(404, "Produto não encontrado")]
+        [Authorize(Policy = "AdminsOnly")]
+        [SwaggerOperation(Summary = "Deletar um produto")]
+        [SwaggerResponse(204, "Produto deletado com sucesso.")]
+        [SwaggerResponse(404, "Nenhum produto com o ID especificado foi encontrado.")]
+        [SwaggerResponse(401, "Não autorizado.")]
+        [SwaggerResponse(403, "Acesso negado.")]
         public async Task<IActionResult> Delete(Guid id)
         {
             var success = await _productService.DeleteAsync(id);

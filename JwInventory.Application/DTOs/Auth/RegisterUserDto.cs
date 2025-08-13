@@ -17,6 +17,6 @@ namespace JwInventory.Application.DTOs.Auth
         public string Password { get; set; } = string.Empty;
 
         /// <summary>Papel do usuário (ex: "User", "Admin").</summary>
-        public string Role { get; set; } = "User";
+        public string Role { get; set; } = "Colaborador";
     }
 }

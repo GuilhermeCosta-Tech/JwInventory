@@ -38,14 +38,12 @@ namespace JwInventory.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configura a hierarquia de usuários (TPH)
             modelBuilder.Entity<PessoaComAcesso>()
                 .HasDiscriminator<string>("UserType")
                 .HasValue<AdminUser>("Admin")
                 .HasValue<ManagerUser>("Gerente")
                 .HasValue<EmployeeUser>("Colaborador");
 
-            // Configura a precisão da propriedade Preco para evitar warnings
             modelBuilder.Entity<Product>()
                 .Property(p => p.Preco)
                 .HasColumnType("decimal(18, 2)");
