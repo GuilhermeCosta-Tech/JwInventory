@@ -1,16 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JwInventory.Application.DTOs.Auth
 {
+    /// <summary>
+    /// DTO para registrar um novo usuário.
+    /// </summary>
     public class RegisterUserDto
     {
-        public string Name { get; set; } = string.Empty; 
+        /// <summary>Nome do usuário.</summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>Email do usuário.</summary>
         public string Email { get; set; } = string.Empty;
+
+        /// <summary>Senha do usuário.</summary>
         public string Password { get; set; } = string.Empty;
-        public string Role { get; set; } = "User";
+
+        /// <summary>Papel do usuário (ex: "User", "Admin").</summary>
+        public string Role { get; set; } = "Colaborador";
     }
 }

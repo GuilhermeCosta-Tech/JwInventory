@@ -1,10 +1,24 @@
 ﻿using JwInventory.Application.DTOs.Auth;
 
-namespace JwInventory.Domain.Interfaces.Services
+/// <summary>
+/// Interface para os serviços de autenticação de usuários.
+/// </summary>
+namespace JwInventory.Application.Interfaces.Services
 {
     public interface IAuthService
     {
-        Task<string> RegisterAsync(RegisterUserDto dto);
-        Task<string> LoginAsync(LoginUserDto dto);
+        /// <summary>
+        /// Registra um novo usuário.
+        /// </summary>
+        /// <param name="dto">Dados do usuário para registro.</param>
+        /// <returns>Token JWT do usuário registrado.</returns>
+        Task<UserResponse> RegisterAsync(RegisterUserDto dto);
+
+        /// <summary>
+        /// Realiza o login de um usuário.
+        /// </summary>
+        /// <param name="dto">Credenciais do usuário.</param>
+        /// <returns>Token JWT se o login for bem-sucedido.</returns>
+        Task<UserResponse> LoginAsync(LoginUserDto dto);
     }
 }

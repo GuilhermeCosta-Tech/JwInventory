@@ -8,8 +8,8 @@ namespace JwInventory.Domain.Enums
 {
     public enum UserRole
     {
-        Admin = 1,
-        Gerente = 2,
-        Colaborador = 3
+        Admin,
+        Gerente,
+        Colaborador
     }
 }

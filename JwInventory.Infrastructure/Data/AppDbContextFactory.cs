@@ -3,17 +3,16 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace JwInventory.Infrastructure.Data
 {
-    public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
+    public class AppDbContextFactory : IDesignTimeDbContextFactory<JwInventoryDbContext>
     {
-        public AppDbContext CreateDbContext(string[] args)
+        public JwInventoryDbContext CreateDbContext(string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<JwInventoryDbContext>();
 
-            // ⚠️ Connection string fixa só para o design-time
-            var connectionString = "Server=localhost;Database=JwInventoryDb;Trusted_Connection=True;TrustServerCertificate=True;";
+            var connectionString = "Server=(localdb)\\MSSQLLocalDB;Database=JwInventoryDb;Trusted_Connection=True;";
             optionsBuilder.UseSqlServer(connectionString);
 
-            return new AppDbContext(optionsBuilder.Options);
+            return new JwInventoryDbContext(optionsBuilder.Options);
         }
     }
 }
